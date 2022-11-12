@@ -7,7 +7,10 @@ import lombok.ToString;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,17 +24,19 @@ public class InventoryServiceApplication {
 	{
 		SpringApplication.run(InventoryServiceApplication.class, args);
 	}
-	CommandLineRunner start(ProductRepository productRepository){
+		@Bean
+		CommandLineRunner start(ProductRepository productRepository, RepositoryRestConfiguration restConfiguration){
+		restConfiguration.exposeIdsFor(Product.class);
 		return args -> {
 			productRepository.save(new Product(null,"Ordinateur",788,12));
 			productRepository.save(new Product(null,"Imprimante",648,10));
 			productRepository.save(new Product(null,"Clavier",89,16));
-			productRepository.findAll().forEach(p ->{
+			productRepository.findAll().forEach(p -> {
 				System.out.println(p.getName());
 			} );
 
 		};
-	}
+	 	}
 }
 @Entity
 @Data @AllArgsConstructor @NoArgsConstructor @ToString
@@ -42,6 +47,7 @@ class Product{
 	private double price;
 	private double quantity;
 }
+@RepositoryRestResource
 interface ProductRepository extends JpaRepository<Product,Long>{
 
 }
